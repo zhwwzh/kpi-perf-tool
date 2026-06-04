@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: kpi-perf-tool
+  datasource:
+    url: ${DB_URL:jdbc:mysql://10.0.2.68:3306/zentao?useSSL=false&serverTimezone=Asia/Shanghai&useCursorFetch=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+
+perf:
+  # === 路径配置（按优先级生效，高 -> 低）===
+  # 1. 命令行：--perf.inputFile=PATH        （推荐，PowerShell 也无坑）
+  # 2. 命令行：-Dperf.inputFile=PATH        （PowerShell 中需要单引号包裹）
+  # 3. 环境变量：PERF_INPUT_FILE / PERF_OUTPUT_DIR
+  # 4. 本 yaml 显式配置（默认注释化）
+  # 5. 内置默认：inputFile -> {jarDir}/perf.sql；outputDir -> {jarDir}/output
+  # 注意：相对路径会按 jarDir 解析（不是 user.dir），跨 OS / 部署目录都安全
+  # inputFile: ${PERF_INPUT_FILE:perf.sql}
+  # outputDir: ${PERF_OUTPUT_DIR:output}
+
+  outputFilePrefix: perf_kpi
+  allowWrite: false
+  sheetNameMaxLen: 31
+
+  # === 流式与性能参数 ===
+  fetchSize: 1000 # JDBC 每次从服务端抓取的行数（mysql 需 useCursorFetch=true）
+  writeBatchSize: 1000 # EasyExcel 每次写入的行数（批量 flush）
+  queryTimeoutSeconds: 300 # 单条 SQL 超时（秒）
